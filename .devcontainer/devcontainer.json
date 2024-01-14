@@ -1,0 +1,18 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+{
+	"name": "dissertation-latex",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
+	"features": {
+		"ghcr.io/prulloac/devcontainer-features/latex:1": {
+			"scheme": "small",
+			"packages": "texdoc,collection-latexrecommended,collection-fontsrecommended,courier-scaled,nextpage,enumitem,epigraph,cleveref"
+		}
+	}
+
+	// , // Add if some latex programs are not found, probably the ones installed with the terminal with tlmgr
+	// "remoteEnv": {
+	// 	"PATH": "${containerEnv:PATH}:/usr/local/texlive/2023/bin/x86_64-linux"
+	// }
+}

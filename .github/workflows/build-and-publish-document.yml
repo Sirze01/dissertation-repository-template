@@ -1,0 +1,60 @@
+name: build-and-publish-document
+on:
+  push:
+    paths:
+      - 'document/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish-document:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          work_in_root_file_dir: true
+          # Add more tex files if needed
+          root_file: |
+            document/main.tex
+      - run: |
+          cp ./document/main.pdf document.pdf
+        # Add more pdf files if needed
+      - name: Publish document
+        uses: actions/upload-artifact@v4
+        with:
+          name: Document
+          path: document.pdf
+  
+  create-release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: build-and-publish-document
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get the artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Document
+      - name: Delete previous release
+        uses: ClementTsang/delete-tag-and-release@v0.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: latest
+          delete_release: true
+      - run: sleep 4
+      - name: Create a release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: Latest document version
+          tag_name: latest
+          generate_release_notes: true
+          files: |
+            document.pdf
